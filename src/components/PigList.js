@@ -6,27 +6,29 @@ class PigList extends React.Component {
 
   state = {
     filterGreased: false, 
-    hogs: this.props.hogs,
+    sortName: false,
+    sortWeight: false
+    // hogs: this.props.hogs,
   }
 
-  sortByName = () => {
-    let nameHogs = [...this.state.hogs]
-    nameHogs.sort(function(a, b) { 
+  sortByName = (pigs) => {
+    let nameHogs = pigs.sort(function(a, b) { 
       if (a.name < b.name ) { return -1 }
       if (a.name > b.name ) { return 1 }
       return 0
     })
-    this.setState({
-      hogs: nameHogs
-    })
+    return nameHogs
+    // this.setState({
+    //   hogs: nameHogs
+    // })
   }
 
-  sortByWeight = () => {
-    let weightHogs = [...this.state.hogs]
-    weightHogs.sort(function(a, b) { return a.weight - b.weight })
-    this.setState({
-      hogs: weightHogs
-    })
+  sortByWeight = (pigs) => {
+    let weightHogs = pigs.sort(function(a, b) { return a.weight - b.weight })
+    return weightHogs
+    // this.setState({
+    //   hogs: weightHogs
+    // })
   }
 
   toggleGreaseFilter = () => {
@@ -35,8 +37,30 @@ class PigList extends React.Component {
     }))
   }
 
+  toggleSortName = () => {
+    this.setState((prevState) => ({
+      sortName: !prevState.sortName
+    }))
+    if (this.state.sortWeight) {
+      this.setState((prevState) => ({
+        sortWeight: !prevState.sortWeight
+      }))
+    }
+  }
+
+  toggleSortWeight = () => {
+    this.setState((prevState) => ({
+      sortWeight: !prevState.sortWeight
+    }))
+    if (this.state.sortName) {
+      this.setState((prevState) => ({
+        sortName: !prevState.sortName
+      }))
+    }
+  }
+
   getFilteredPigs = () => {
-    let filteredHogs = this.state.hogs
+    let filteredHogs = this.props.hogs
     .filter(hog => {
       if (this.state.filterGreased) {
         return hog.greased
@@ -52,12 +76,14 @@ class PigList extends React.Component {
 
   render() {
     let pigs = this.getFilteredPigs()
+    pigs = this.state.sortName ? this.sortByName(pigs) : pigs
+    pigs = this.state.sortWeight ? this.sortByWeight(pigs) : pigs
 
     return (
       <div>
         <button onClick={this.toggleGreaseFilter}>Showed Greased Pigs</button>
-        <button onClick={this.sortByName}>Sort By Name</button>
-        <button onClick={this.sortByWeight}>Sort By Weight</button>
+        <button onClick={this.toggleSortName}>Sort By Name</button>
+        <button onClick={this.toggleSortWeight}>Sort By Weight</button>
         <ul>
           { this.renderPigs(pigs) }
         </ul>
